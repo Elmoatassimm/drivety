@@ -35,7 +35,7 @@ export class VehicleRouter {
     this.router.post(
       "/",
       authMiddleware,
-      checkRole(["ADMIN", "MANAGER"]),
+      checkRole(["ADMIN"]),
       this.vehicleController.createVehicle
     );
 
@@ -43,7 +43,7 @@ export class VehicleRouter {
     this.router.put(
       "/:id",
       authMiddleware,
-      checkRole(["ADMIN", "MANAGER"]),
+      checkRole(["ADMIN"]),
       this.vehicleController.updateVehicle
     );
 
@@ -51,7 +51,7 @@ export class VehicleRouter {
     this.router.delete(
       "/:id",
       authMiddleware,
-      checkRole(["ADMIN", "MANAGER"]),
+      checkRole(["ADMIN"]),
       this.vehicleController.deleteVehicle
     );
 
@@ -66,7 +66,7 @@ export class VehicleRouter {
     this.router.patch(
       "/:id/health-status",
       authMiddleware,
-      checkRole(["ADMIN", "MANAGER", "TECHNICIAN"]),
+      checkRole(["ADMIN"]),
       this.vehicleController.updateVehicleHealthStatus
     );
 

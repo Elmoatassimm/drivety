@@ -25,7 +25,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>0/12</span>
+                <span class='fraction'>0/21</span>
             </div>
         
             
@@ -46,7 +46,7 @@
             <div class='fl pad1y space-right2'>
                 <span class="strong">0% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>0/12</span>
+                <span class='fraction'>0/21</span>
             </div>
         
             
@@ -86,7 +86,22 @@
 <a name='L21'></a><a href='#L21'>21</a>
 <a name='L22'></a><a href='#L22'>22</a>
 <a name='L23'></a><a href='#L23'>23</a>
-<a name='L24'></a><a href='#L24'>24</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -94,11 +109,26 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -117,6 +147,9 @@
 <span class="cstat-no" title="statement not covered" >import authRouter from './modules/auth/auth.routes';</span>
 <span class="cstat-no" title="statement not covered" >import { UserRouter } from './modules/user/user.routes';</span>
 <span class="cstat-no" title="statement not covered" >import { DriverRouter } from './modules/driver/driver.routes';</span>
+<span class="cstat-no" title="statement not covered" >import { VehicleRouter } from './modules/vehicle/vehicle.routes';</span>
+<span class="cstat-no" title="statement not covered" >import { ComponentRouter } from './modules/component/component.routes';</span>
+<span class="cstat-no" title="statement not covered" >import { TripRouter } from './modules/trip/trip.routes';</span>
 &nbsp;
 // Create router instance
 const router = <span class="cstat-no" title="statement not covered" >Router();</span>
@@ -132,6 +165,18 @@ const userRouter = <span class="cstat-no" title="statement not covered" >contain
 const driverRouter = <span class="cstat-no" title="statement not covered" >container.resolve(DriverRouter);</span>
 <span class="cstat-no" title="statement not covered" >router.use('/api/drivers', driverRouter.getRouter());</span>
 &nbsp;
+// Register Vehicle routes
+const vehicleRouter = <span class="cstat-no" title="statement not covered" >container.resolve(VehicleRouter);</span>
+<span class="cstat-no" title="statement not covered" >router.use('/api/vehicles', vehicleRouter.getRouter());</span>
+&nbsp;
+// Register Component routes
+const componentRouter = <span class="cstat-no" title="statement not covered" >container.resolve(ComponentRouter);</span>
+<span class="cstat-no" title="statement not covered" >router.use('/api/components', componentRouter.getRouter());</span>
+&nbsp;
+// Register Trip routes
+const tripRouter = <span class="cstat-no" title="statement not covered" >container.resolve(TripRouter);</span>
+<span class="cstat-no" title="statement not covered" >router.use('/api/trips', tripRouter.getRouter());</span>
+&nbsp;
 <span class="cstat-no" title="statement not covered" >export default router;</span></pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->
@@ -139,7 +184,7 @@ const driverRouter = <span class="cstat-no" title="statement not covered" >conta
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-05-13T09:27:30.690Z
+                at 2025-05-16T16:18:09.168Z
             </div>
         <script src="../prettify.js"></script>
         <script>

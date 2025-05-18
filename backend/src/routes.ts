@@ -8,6 +8,7 @@ import { UserRouter } from './modules/user/user.routes';
 import { DriverRouter } from './modules/driver/driver.routes';
 import { VehicleRouter } from './modules/vehicle/vehicle.routes';
 import { ComponentRouter } from './modules/component/component.routes';
+import { TripRouter } from './modules/trip/trip.routes';
 
 // Create router instance
 const router = Router();
@@ -30,5 +31,9 @@ router.use('/api/vehicles', vehicleRouter.getRouter());
 // Register Component routes
 const componentRouter = container.resolve(ComponentRouter);
 router.use('/api/components', componentRouter.getRouter());
+
+// Register Trip routes
+const tripRouter = container.resolve(TripRouter);
+router.use('/api/trips', tripRouter.getRouter());
 
 export default router;

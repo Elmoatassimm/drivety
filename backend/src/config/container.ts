@@ -17,6 +17,8 @@ import { registerUserDependencies } from "../modules/user/user.container";
 import { registerDriverDependencies } from "../modules/driver/driver.container";
 import { registerVehicleDependencies } from "../modules/vehicle/vehicle.container";
 import { registerComponentDependencies } from "../modules/component/component.container";
+import { registerTripDependencies } from "../modules/trip/trip.container";
+import { registerTripMetricsDependencies } from "../core/tripMetrics/tripMetrics.container";
 
 
 
@@ -56,5 +58,7 @@ registerUserDependencies();
 registerDriverDependencies();
 registerVehicleDependencies();
 registerComponentDependencies();
+registerTripDependencies();
+registerTripMetricsDependencies();
 
 export { container };

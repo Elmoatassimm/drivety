@@ -1,0 +1,1296 @@
+{
+	"info": {
+		"_postman_id": "0f5b24cb-dbb2-47bb-b181-a5be95dca087",
+		"name": "Drivety API Copy",
+		"description": "API collection for testing the Drivety application",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "36773225"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIxOWY3MzA5Ni1kYjlkLTQ2MjQtYTlmMy00NmIwOTFmMWQzNDgiLCJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJ1c2VybmFtZSI6InVzZXIiLCJpYXQiOjE3NDcyNjI3NTYsImV4cCI6MTc0NzM0OTE1Nn0.zeBk4g_LLMHStIlIzkPlsenqKd6fC7dkjdsOHUZxGC0",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"test@exxxample.com\",\n    \"password\": \"Password123!\",\n    \"username\":\"test\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/register",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"register"
+							]
+						},
+						"description": "Register a new user"
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Parse the response",
+									"var jsonData = pm.response.json();",
+									"",
+									"// Log the full response for debugging",
+									"console.log('Response:', JSON.stringify(jsonData, null, 2));",
+									"",
+									"// Check if the request was successful",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"// If successful, save the tokens",
+									"if (pm.response.code === 200 && jsonData && jsonData.data) {",
+									"    pm.environment.set(\"accessToken\", jsonData.data.accessToken);",
+									"    pm.environment.set(\"refreshToken\", jsonData.data.refreshToken);",
+									"    console.log('Tokens saved to environment variables');",
+									"    ",
+									"    // Try to extract user ID from token",
+									"    try {",
+									"        const tokenParts = jsonData.data.accessToken.split('.');",
+									"        if (tokenParts.length === 3) {",
+									"            const payload = JSON.parse(atob(tokenParts[1]));",
+									"            if (payload.userId) {",
+									"                pm.environment.set(\"userId\", payload.userId);",
+									"                console.log('User ID saved:', payload.userId);",
+									"            }",
+									"        }",
+									"    } catch (e) {",
+									"        console.log('Could not extract user ID from token:', e);",
+									"    }",
+									"} else {",
+									"    console.log('Error response:', jsonData);",
+									"}",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"test@exxxample.com\",\n    \"password\": \"Password123!\",\n    \"username\":\"test\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						},
+						"description": "Login to get access token"
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Parse the response",
+									"var jsonData = pm.response.json();",
+									"",
+									"// Log the full response for debugging",
+									"console.log('Response:', JSON.stringify(jsonData, null, 2));",
+									"",
+									"// Check if the request was successful",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"// If successful, save the tokens",
+									"if (pm.response.code === 200 && jsonData && jsonData.data) {",
+									"    pm.environment.set(\"accessToken\", jsonData.data.accessToken);",
+									"    pm.environment.set(\"refreshToken\", jsonData.data.refreshToken);",
+									"    console.log('Tokens refreshed and saved to environment variables');",
+									"} else {",
+									"    console.log('Error refreshing token:', jsonData);",
+									"}",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Check if we have a refresh token",
+									"const refreshToken = pm.environment.get(\"refreshToken\");",
+									"",
+									"if (!refreshToken) {",
+									"    console.log('Warning: No refresh token found in environment variables. This request will likely fail.');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "x-refresh-token",
+								"value": "{{refreshToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/refresh-token",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"refresh-token"
+							]
+						},
+						"description": "Refresh access token"
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Parse the response",
+									"var jsonData = pm.response.json();",
+									"",
+									"// Log the full response for debugging",
+									"console.log('Response:', JSON.stringify(jsonData, null, 2));",
+									"",
+									"// Check if the request was successful",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"// If successful, clear the tokens",
+									"if (pm.response.code === 200) {",
+									"    pm.environment.set(\"accessToken\", \"\");",
+									"    pm.environment.set(\"refreshToken\", \"\");",
+									"    console.log('Tokens cleared from environment variables');",
+									"} else {",
+									"    console.log('Error during logout:', jsonData);",
+									"}",
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Check if we have an access token",
+									"const accessToken = pm.environment.get(\"accessToken\");",
+									"",
+									"if (!accessToken) {",
+									"    console.log('Warning: No access token found in environment variables. This request will likely fail.');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/logout",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"logout"
+							]
+						},
+						"description": "Logout and invalidate tokens"
+					},
+					"response": []
+				}
+			],
+			"description": "Authentication endpoints"
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "Get User Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/users/profile",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"profile"
+							]
+						},
+						"description": "Get current user profile"
+					},
+					"response": []
+				}
+			],
+			"description": "User management endpoints"
+		},
+		{
+			"name": "Drivers",
+			"item": [
+				{
+					"name": "Create Driver",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"John Doe\",\n    \"licenseNumber\": \"DL12345678\",\n    \"licenseExpiry\": \"2025-12-31T00:00:00.000Z\",\n    \"phoneNumber\": \"+1234567890\",\n    \"userId\":\"2fc72956-6a6a-4f48-b1c6-baef1d638e3e\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/drivers",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"drivers"
+							]
+						},
+						"description": "Create a new driver"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Drivers",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/drivers",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"drivers"
+							]
+						},
+						"description": "Get all drivers"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Driver by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/drivers/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"drivers",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "85a4b673-e39d-4223-afa6-a635b805b1bf"
+								}
+							]
+						},
+						"description": "Get driver by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Current User Driver",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/drivers/me",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"drivers",
+								"me"
+							]
+						},
+						"description": "Get driver profile for current user"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Driver",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"John Smith\",\n    \"licenseNumber\": \"DL12345678\",\n    \"licenseExpiry\": \"2026-12-31T00:00:00.000Z\",\n    \"phoneNumber\": \"+1234567890\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/drivers/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"drivers",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "85a4b673-e39d-4223-afa6-a635b805b1bf"
+								}
+							]
+						},
+						"description": "Update driver information"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Driver Score",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"score\": 85.5\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/drivers/:id/score",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"drivers",
+								":id",
+								"score"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "85a4b673-e39d-4223-afa6-a635b805b1bf"
+								}
+							]
+						},
+						"description": "Update driver score"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Driver",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/drivers/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"drivers",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "driver_id_here"
+								}
+							]
+						},
+						"description": "Delete a driver"
+					},
+					"response": []
+				}
+			],
+			"description": "Driver management endpoints"
+		},
+		{
+			"name": "Vehicles",
+			"item": [
+				{
+					"name": "Create Vehicle",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"model\": \"Toyota Camry\",\n    \"year\": 2022,\n    \"plateNumber\": \"ABC123\",\n    \"status\": \"ACTIVE\",\n    \"fuelType\": \"GASOLINE\",\n    \"fuelLevel\": 75.5,\n    \"insuranceExpiry\": \"2025-12-31T00:00:00.000Z\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/vehicles",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"vehicles"
+							]
+						},
+						"description": "Create a new vehicle"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Vehicles",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/vehicles",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"vehicles"
+							]
+						},
+						"description": "Get all vehicles"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Vehicle by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/vehicles/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"vehicles",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "42d3772b-eb5b-4254-b7c9-82e41dec4084"
+								}
+							]
+						},
+						"description": "Get vehicle by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Vehicle",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"model\": \"Toyota Camry\",\n    \"year\": 2022,\n    \"plateNumber\": \"ABC123\",\n    \"status\": \"MAINTENANCE\",\n    \"fuelType\": \"GASOLINE\",\n    \"fuelLevel\": 50.0,\n    \"insuranceExpiry\": \"2025-12-31T00:00:00.000Z\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/vehicles/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"vehicles",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "42d3772b-eb5b-4254-b7c9-82e41dec4084"
+								}
+							]
+						},
+						"description": "Update vehicle information"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Vehicle",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/vehicles/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"vehicles",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "vehicle_id_here"
+								}
+							]
+						},
+						"description": "Delete a vehicle"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Vehicle Components",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/vehicles/:id/components",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"vehicles",
+								":id",
+								"components"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "vehicle_id_here"
+								}
+							]
+						},
+						"description": "Get all components for a vehicle"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Vehicle Health Status",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"MAINTENANCE\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/vehicles/:id/health-status",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"vehicles",
+								":id",
+								"health-status"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "vehicle_id_here"
+								}
+							]
+						},
+						"description": "Update vehicle health status"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Vehicle Maintenance History",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/vehicles/:id/maintenance-history",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"vehicles",
+								":id",
+								"maintenance-history"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "vehicle_id_here"
+								}
+							]
+						},
+						"description": "Get maintenance history for a vehicle"
+					},
+					"response": []
+				}
+			],
+			"description": "Vehicle management endpoints"
+		},
+		{
+			"name": "Components",
+			"item": [
+				{
+					"name": "Create Component",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"vehicleId\": \"vehicle_id_here\",\n    \"componentType\": \"ENGINE\",\n    \"name\": \"V6 Engine\",\n    \"status\": \"GOOD\",\n    \"healthScore\": 95.0,\n    \"expectedLifespan\": 120000,\n    \"metadata\": \"{\\\"manufacturer\\\": \\\"Toyota\\\", \\\"serialNumber\\\": \\\"ENG123456\\\"}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/components",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"components"
+							]
+						},
+						"description": "Create a new component"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Components",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/components",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"components"
+							]
+						},
+						"description": "Get all components"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Component by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/components/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"components",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "component_id_here"
+								}
+							]
+						},
+						"description": "Get component by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Component",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"componentType\": \"ENGINE\",\n    \"name\": \"V6 Engine\",\n    \"status\": \"NEEDS_MAINTENANCE\",\n    \"healthScore\": 75.0,\n    \"expectedLifespan\": 120000,\n    \"metadata\": \"{\\\"manufacturer\\\": \\\"Toyota\\\", \\\"serialNumber\\\": \\\"ENG123456\\\"}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/components/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"components",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "component_id_here"
+								}
+							]
+						},
+						"description": "Update component information"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Component",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/components/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"components",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "component_id_here"
+								}
+							]
+						},
+						"description": "Delete a component"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Component Health Score",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/components/:id/health-score",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"components",
+								":id",
+								"health-score"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "component_id_here"
+								}
+							]
+						},
+						"description": "Get health score for a component"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Component Maintenance Records",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/components/:id/maintenance-records",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"components",
+								":id",
+								"maintenance-records"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "component_id_here"
+								}
+							]
+						},
+						"description": "Get maintenance records for a component"
+					},
+					"response": []
+				},
+				{
+					"name": "Trigger Component Alert",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"type\": \"MAINTENANCE_REQUIRED\",\n    \"message\": \"Engine maintenance required\",\n    \"actionRequired\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/components/:id/alert",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"components",
+								":id",
+								"alert"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "component_id_here"
+								}
+							]
+						},
+						"description": "Trigger an alert for a component"
+					},
+					"response": []
+				}
+			],
+			"description": "Component management endpoints"
+		},
+		{
+			"name": "Trips",
+			"item": [
+				{
+					"name": "Start Trip",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"driverId\": \"85a4b673-e39d-4223-afa6-a635b805b1bf\",\n    \"vehicleId\": \"42d3772b-eb5b-4254-b7c9-82e41dec4084\",\n    \"startLocation\": \"123 Main St, Anytown, USA\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/trips/start",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"trips",
+								"start"
+							]
+						},
+						"description": "Start a new trip"
+					},
+					"response": []
+				},
+				{
+					"name": "End Trip",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"endLocation\": \"456 Oak St, Anytown, USA\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/trips/:tripId/end",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"trips",
+								":tripId",
+								"end"
+							],
+							"variable": [
+								{
+									"key": "tripId",
+									"value": "trip_id_here"
+								}
+							]
+						},
+						"description": "End an active trip"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Trip Metrics",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/trips/:tripId/metrics",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"trips",
+								":tripId",
+								"metrics"
+							],
+							"variable": [
+								{
+									"key": "tripId",
+									"value": "trip_id_here"
+								}
+							]
+						},
+						"description": "Get metrics for a specific trip"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Driver Trips",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/trips/driver/:driverId",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"trips",
+								"driver",
+								":driverId"
+							],
+							"variable": [
+								{
+									"key": "driverId",
+									"value": "85a4b673-e39d-4223-afa6-a635b805b1bf"
+								}
+							]
+						},
+						"description": "Get all trips for a specific driver"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Trips",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/trips",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"trips"
+							]
+						},
+						"description": "Get all trips"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Trip by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/trips/:id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"trips",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "trip_id_here"
+								}
+							]
+						},
+						"description": "Get trip by ID"
+					},
+					"response": []
+				}
+			],
+			"description": "Trip management endpoints"
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJlMWRkMmU4Yi05YWM5LTQ5NzctOTNlYy1kNDlkY2U5ZjI1ZDQiLCJlbWFpbCI6InRlc3RAZXh4eHh4YW1wbGUuY29tIiwidXNlcm5hbWUiOiJ1c2VyIiwiaWF0IjoxNzQ3NjAzNDU4LCJleHAiOjE3NDc2ODk4NTh9.mkzeCKKSNlglZMqYvmoC3Q9c_ZXAH4VTumcvcpfj-fY",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8005",
+			"type": "string"
+		}
+	]
+}
