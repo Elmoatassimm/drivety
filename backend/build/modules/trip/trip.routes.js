@@ -20,6 +20,7 @@ const auth_middleware_1 = __importDefault(require("../../core/middlewares/auth.m
 const RequestValidation_middleware_1 = require("../../core/middlewares/RequestValidation.middleware");
 const trip_validation_1 = require("./validation/trip.validation");
 const role_middleware_1 = require("../../core/middlewares/role.middleware");
+const user_types_1 = require("../../types/user.types");
 let TripRouter = class TripRouter {
     constructor(tripController) {
         this.tripController = tripController;
@@ -28,9 +29,9 @@ let TripRouter = class TripRouter {
     }
     setupRoutes() {
         // Start a new trip
-        this.router.post("/start", auth_middleware_1.default, (0, role_middleware_1.checkRole)(["DRIVER", "ADMIN"]), (0, RequestValidation_middleware_1.validateRequest)(trip_validation_1.startTripSchema), (req, res, next) => this.tripController.startTrip(req, res, next));
+        this.router.post("/start", auth_middleware_1.default, (0, role_middleware_1.checkRole)([user_types_1.UserRole.DRIVER, user_types_1.UserRole.ADMIN]), (0, RequestValidation_middleware_1.validateRequest)(trip_validation_1.startTripSchema), (req, res, next) => this.tripController.startTrip(req, res, next));
         // End a trip
-        this.router.put("/:tripId/end", auth_middleware_1.default, (0, role_middleware_1.checkRole)(["DRIVER", "ADMIN"]), (0, RequestValidation_middleware_1.validateRequest)(trip_validation_1.endTripSchema), (req, res, next) => this.tripController.endTrip(req, res, next));
+        this.router.put("/:tripId/end", auth_middleware_1.default, (0, role_middleware_1.checkRole)([user_types_1.UserRole.DRIVER, user_types_1.UserRole.ADMIN]), (0, RequestValidation_middleware_1.validateRequest)(trip_validation_1.endTripSchema), (req, res, next) => this.tripController.endTrip(req, res, next));
         // Get trip metrics
         this.router.get("/:tripId/metrics", auth_middleware_1.default, (req, res, next) => this.tripController.getTripMetrics(req, res, next));
         // Get driver trips

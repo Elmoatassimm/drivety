@@ -5,6 +5,7 @@ import authMiddleware from "../../core/middlewares/auth.middleware";
 import { validateRequest } from "../../core/middlewares/RequestValidation.middleware";
 import { startTripSchema, endTripSchema } from "./validation/trip.validation";
 import { checkRole } from "../../core/middlewares/role.middleware";
+import { UserRole } from "../../types/user.types";
 
 @injectable()
 export class TripRouter {
@@ -22,7 +23,7 @@ export class TripRouter {
     this.router.post(
       "/start",
       authMiddleware,
-      checkRole(["DRIVER", "ADMIN"]),
+      checkRole([UserRole.DRIVER, UserRole.ADMIN]),
       validateRequest(startTripSchema),
       (req, res, next) => this.tripController.startTrip(req, res, next)
     );
@@ -31,7 +32,7 @@ export class TripRouter {
     this.router.put(
       "/:tripId/end",
       authMiddleware,
-      checkRole(["DRIVER", "ADMIN"]),
+      checkRole([UserRole.DRIVER, UserRole.ADMIN]),
       validateRequest(endTripSchema),
       (req, res, next) => this.tripController.endTrip(req, res, next)
     );

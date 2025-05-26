@@ -72,7 +72,7 @@ function main() {
                 create: {
                     email: "admin@drivety.com",
                     password: adminPassword,
-                    role: "ADMIN",
+                    role: client_1.UserRole.ADMIN,
                 },
             });
             const user1 = yield prisma.user.upsert({
@@ -81,7 +81,7 @@ function main() {
                 create: {
                     email: "driver1@drivety.com",
                     password: userPassword,
-                    role: "USER",
+                    role: client_1.UserRole.USER,
                 },
             });
             const user2 = yield prisma.user.upsert({
@@ -90,7 +90,7 @@ function main() {
                 create: {
                     email: "driver2@drivety.com",
                     password: userPassword,
-                    role: "USER",
+                    role: client_1.UserRole.USER,
                 },
             });
             const technician = yield prisma.user.upsert({
@@ -99,7 +99,7 @@ function main() {
                 create: {
                     email: "tech@drivety.com",
                     password: techPassword,
-                    role: "TECHNICIAN",
+                    role: client_1.UserRole.TECHNICIAN,
                 },
             });
             const manager = yield prisma.user.upsert({
@@ -108,7 +108,7 @@ function main() {
                 create: {
                     email: "manager@drivety.com",
                     password: managerPassword,
-                    role: "MANAGER",
+                    role: client_1.UserRole.MANAGER,
                 },
             });
             console.log("Users created successfully");

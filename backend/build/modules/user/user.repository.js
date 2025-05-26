@@ -103,7 +103,7 @@ let UserRepository = class UserRepository extends BaseRepository_1.BaseRepositor
                     data: {
                         email: data.email,
                         password: data.password_hash,
-                        role: role // Explicitly set the role
+                        role: role // Type assertion needed due to Prisma enum typing
                     }
                 });
                 console.log(`[USER REPOSITORY] User created successfully with ID: ${user.id}`);

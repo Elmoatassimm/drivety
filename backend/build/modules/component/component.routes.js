@@ -21,6 +21,7 @@ const tsyringe_1 = require("tsyringe");
 const component_controller_1 = require("./component.controller");
 const auth_middleware_1 = __importDefault(require("../../core/middlewares/auth.middleware"));
 const role_middleware_1 = require("../../core/middlewares/role.middleware");
+const user_types_1 = require("../../types/user.types");
 let ComponentRouter = class ComponentRouter {
     constructor(componentController) {
         this.componentController = componentController;
@@ -33,17 +34,19 @@ let ComponentRouter = class ComponentRouter {
         // Get component by ID
         this.router.get("/:id", auth_middleware_1.default, this.componentController.getComponentById);
         // Create a new component
-        this.router.post("/", auth_middleware_1.default, (0, role_middleware_1.checkRole)(["ADMIN", "MANAGER", "TECHNICIAN"]), this.componentController.createComponent);
+        this.router.post("/", auth_middleware_1.default, (0, role_middleware_1.checkRole)([user_types_1.UserRole.ADMIN, user_types_1.UserRole.MANAGER, user_types_1.UserRole.TECHNICIAN]), this.componentController.createComponent);
         // Update a component
-        this.router.put("/:id", auth_middleware_1.default, (0, role_middleware_1.checkRole)(["ADMIN", "MANAGER", "TECHNICIAN"]), this.componentController.updateComponent);
+        this.router.put("/:id", auth_middleware_1.default, (0, role_middleware_1.checkRole)([user_types_1.UserRole.ADMIN, user_types_1.UserRole.MANAGER, user_types_1.UserRole.TECHNICIAN]), this.componentController.updateComponent);
         // Delete a component
-        this.router.delete("/:id", auth_middleware_1.default, (0, role_middleware_1.checkRole)(["ADMIN", "MANAGER"]), this.componentController.deleteComponent);
+        this.router.delete("/:id", auth_middleware_1.default, (0, role_middleware_1.checkRole)([user_types_1.UserRole.ADMIN, user_types_1.UserRole.MANAGER]), this.componentController.deleteComponent);
         // Get component health score
         this.router.get("/:id/health-score", auth_middleware_1.default, this.componentController.getComponentHealthScore);
         // Get component maintenance records
         this.router.get("/:id/maintenance-records", auth_middleware_1.default, this.componentController.getComponentMaintenanceRecords);
+        // Get components by vehicle ID
+        this.router.get("/vehicle/:id", auth_middleware_1.default, (0, role_middleware_1.checkRole)([user_types_1.UserRole.ADMIN, user_types_1.UserRole.MANAGER, user_types_1.UserRole.TECHNICIAN]), this.componentController.getAllComponents);
         // Trigger component alert
-        this.router.post("/:id/alert", auth_middleware_1.default, (0, role_middleware_1.checkRole)(["ADMIN", "MANAGER", "TECHNICIAN"]), this.componentController.triggerComponentAlert);
+        this.router.post("/:id/alert", auth_middleware_1.default, (0, role_middleware_1.checkRole)([user_types_1.UserRole.ADMIN, user_types_1.UserRole.MANAGER, user_types_1.UserRole.TECHNICIAN]), this.componentController.triggerComponentAlert);
     }
     getRouter() {
         return this.router;

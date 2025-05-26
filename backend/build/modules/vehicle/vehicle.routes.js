@@ -21,6 +21,7 @@ const tsyringe_1 = require("tsyringe");
 const vehicle_controller_1 = require("./vehicle.controller");
 const auth_middleware_1 = __importDefault(require("../../core/middlewares/auth.middleware"));
 const role_middleware_1 = require("../../core/middlewares/role.middleware");
+const user_types_1 = require("../../types/user.types");
 let VehicleRouter = class VehicleRouter {
     constructor(vehicleController) {
         this.vehicleController = vehicleController;
@@ -33,15 +34,15 @@ let VehicleRouter = class VehicleRouter {
         // Get vehicle by ID
         this.router.get("/:id", auth_middleware_1.default, this.vehicleController.getVehicleById);
         // Create a new vehicle
-        this.router.post("/", auth_middleware_1.default, (0, role_middleware_1.checkRole)(["ADMIN"]), this.vehicleController.createVehicle);
+        this.router.post("/", auth_middleware_1.default, (0, role_middleware_1.checkRole)([user_types_1.UserRole.ADMIN]), this.vehicleController.createVehicle);
         // Update a vehicle
-        this.router.put("/:id", auth_middleware_1.default, (0, role_middleware_1.checkRole)(["ADMIN"]), this.vehicleController.updateVehicle);
+        this.router.put("/:id", auth_middleware_1.default, (0, role_middleware_1.checkRole)([user_types_1.UserRole.ADMIN]), this.vehicleController.updateVehicle);
         // Delete a vehicle
-        this.router.delete("/:id", auth_middleware_1.default, (0, role_middleware_1.checkRole)(["ADMIN"]), this.vehicleController.deleteVehicle);
+        this.router.delete("/:id", auth_middleware_1.default, (0, role_middleware_1.checkRole)([user_types_1.UserRole.ADMIN]), this.vehicleController.deleteVehicle);
         // Get vehicle components
-        this.router.get("/:id/components", auth_middleware_1.default, this.vehicleController.getVehicleComponents);
+        this.router.get("/:id/components", auth_middleware_1.default, (0, role_middleware_1.checkRole)([user_types_1.UserRole.ADMIN]), this.vehicleController.getVehicleComponents);
         // Update vehicle health status
-        this.router.patch("/:id/health-status", auth_middleware_1.default, (0, role_middleware_1.checkRole)(["ADMIN"]), this.vehicleController.updateVehicleHealthStatus);
+        this.router.patch("/:id/health-status", auth_middleware_1.default, (0, role_middleware_1.checkRole)([user_types_1.UserRole.ADMIN]), this.vehicleController.updateVehicleHealthStatus);
         // Get vehicle maintenance history
         this.router.get("/:id/maintenance-history", auth_middleware_1.default, this.vehicleController.getVehicleMaintenanceHistory);
     }

@@ -4,6 +4,7 @@ import { ComponentController } from "./component.controller";
 import authMiddleware from "../../core/middlewares/auth.middleware";
 import { validateRequest } from "../../core/middlewares/RequestValidation.middleware";
 import { checkRole } from "../../core/middlewares/role.middleware";
+import { UserRole } from "../../types/user.types";
 
 @injectable()
 export class ComponentRouter {
@@ -35,7 +36,7 @@ export class ComponentRouter {
     this.router.post(
       "/",
       authMiddleware,
-      checkRole(["ADMIN", "MANAGER", "TECHNICIAN"]),
+      checkRole([UserRole.ADMIN, UserRole.MANAGER, UserRole.TECHNICIAN]),
       this.componentController.createComponent
     );
 
@@ -43,7 +44,7 @@ export class ComponentRouter {
     this.router.put(
       "/:id",
       authMiddleware,
-      checkRole(["ADMIN", "MANAGER", "TECHNICIAN"]),
+      checkRole([UserRole.ADMIN, UserRole.MANAGER, UserRole.TECHNICIAN]),
       this.componentController.updateComponent
     );
 
@@ -51,7 +52,7 @@ export class ComponentRouter {
     this.router.delete(
       "/:id",
       authMiddleware,
-      checkRole(["ADMIN", "MANAGER"]),
+      checkRole([UserRole.ADMIN, UserRole.MANAGER]),
       this.componentController.deleteComponent
     );
 
@@ -69,11 +70,19 @@ export class ComponentRouter {
       this.componentController.getComponentMaintenanceRecords
     );
 
+    // Get components by vehicle ID
+    this.router.get(
+      "/vehicle/:id",
+      authMiddleware,
+      checkRole([UserRole.ADMIN, UserRole.MANAGER, UserRole.TECHNICIAN]),
+      this.componentController.getAllComponents
+    );
+
     // Trigger component alert
     this.router.post(
       "/:id/alert",
       authMiddleware,
-      checkRole(["ADMIN", "MANAGER", "TECHNICIAN"]),
+      checkRole([UserRole.ADMIN, UserRole.MANAGER, UserRole.TECHNICIAN]),
       this.componentController.triggerComponentAlert
     );
   }

@@ -81,7 +81,7 @@ export class UserRepository extends BaseRepository<IUser> implements IUserReposi
         data: {
           email: data.email,
           password: data.password_hash,
-          role: role  // Explicitly set the role
+          role: role as any  // Type assertion needed due to Prisma enum typing
         }
       });
       console.log(`[USER REPOSITORY] User created successfully with ID: ${user.id}`);

@@ -4,6 +4,7 @@ import { VehicleController } from "./vehicle.controller";
 import authMiddleware from "../../core/middlewares/auth.middleware";
 import { validateRequest } from "../../core/middlewares/RequestValidation.middleware";
 import { checkRole } from "../../core/middlewares/role.middleware";
+import { UserRole } from "../../types/user.types";
 
 @injectable()
 export class VehicleRouter {
@@ -35,7 +36,7 @@ export class VehicleRouter {
     this.router.post(
       "/",
       authMiddleware,
-      checkRole(["ADMIN"]),
+      checkRole([UserRole.ADMIN]),
       this.vehicleController.createVehicle
     );
 
@@ -43,7 +44,7 @@ export class VehicleRouter {
     this.router.put(
       "/:id",
       authMiddleware,
-      checkRole(["ADMIN"]),
+      checkRole([UserRole.ADMIN]),
       this.vehicleController.updateVehicle
     );
 
@@ -51,7 +52,7 @@ export class VehicleRouter {
     this.router.delete(
       "/:id",
       authMiddleware,
-      checkRole(["ADMIN"]),
+      checkRole([UserRole.ADMIN]),
       this.vehicleController.deleteVehicle
     );
 
@@ -59,6 +60,7 @@ export class VehicleRouter {
     this.router.get(
       "/:id/components",
       authMiddleware,
+      checkRole([UserRole.ADMIN]),
       this.vehicleController.getVehicleComponents
     );
 
@@ -66,7 +68,7 @@ export class VehicleRouter {
     this.router.patch(
       "/:id/health-status",
       authMiddleware,
-      checkRole(["ADMIN"]),
+      checkRole([UserRole.ADMIN]),
       this.vehicleController.updateVehicleHealthStatus
     );
 

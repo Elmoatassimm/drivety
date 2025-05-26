@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, UserRole } from "@prisma/client";
 import * as bcrypt from "bcryptjs";
 import * as fs from 'fs';
 
@@ -33,7 +33,7 @@ async function main() {
       create: {
         email: "admin@drivety.com",
         password: adminPassword,
-        role: "ADMIN",
+        role: UserRole.ADMIN,
       },
     });
 
@@ -43,7 +43,7 @@ async function main() {
       create: {
         email: "driver1@drivety.com",
         password: userPassword,
-        role: "USER",
+        role: UserRole.USER,
       },
     });
 
@@ -53,7 +53,7 @@ async function main() {
       create: {
         email: "driver2@drivety.com",
         password: userPassword,
-        role: "USER",
+        role: UserRole.USER,
       },
     });
 
@@ -63,7 +63,7 @@ async function main() {
       create: {
         email: "tech@drivety.com",
         password: techPassword,
-        role: "TECHNICIAN",
+        role: UserRole.TECHNICIAN,
       },
     });
 
@@ -73,7 +73,7 @@ async function main() {
       create: {
         email: "manager@drivety.com",
         password: managerPassword,
-        role: "MANAGER",
+        role: UserRole.MANAGER,
       },
     });
 
