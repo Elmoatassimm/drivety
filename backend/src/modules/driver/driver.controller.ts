@@ -6,11 +6,13 @@ import ResponseUtils from "../../core/utils/response.utils";
 import { IDriver } from "./interfaces/IDriverRepository";
 import { RequestWithUser } from "../../types/types";
 import { NotFoundError } from "../../core/errors/AppError";
+import IVehicleService from "../vehicle/interfaces/IVehicleService";
 
 @injectable()
 export class DriverController extends BaseController<IDriver> {
   constructor(
     @inject("IDriverService") private driverService: DriverService,
+    @inject("IVehicleService") private vehicleService: IVehicleService,
     @inject("responseUtils") responseUtils: ResponseUtils
   ) {
     super(driverService, responseUtils);
@@ -99,8 +101,18 @@ export class DriverController extends BaseController<IDriver> {
         throw new NotFoundError("Driver not found for current user");
       }
 
-      console.log(`[DRIVER CONTROLLER] Returning driver with ID: ${driver.id} for current user`);
-      this.responseUtils.sendSuccessResponse(res, driver);
+      console.log(`[DRIVER CONTROLLER] Looking up vehicles for driver ID: ${driver.id}`);
+      const vehicles = await this.vehicleService.findByDriverId(driver.id);
+      console.log(`[DRIVER CONTROLLER] Found ${vehicles.length} vehicles for driver ID: ${driver.id}`);
+
+      // Combine driver information with vehicles
+      const response = {
+        ...driver,
+        vehicles: vehicles
+      };
+
+      console.log(`[DRIVER CONTROLLER] Returning driver with ID: ${driver.id} and ${vehicles.length} vehicles for current user`);
+      this.responseUtils.sendSuccessResponse(res, response);
     } catch (error: any) {
       console.error(`[DRIVER CONTROLLER] Error getting current user driver:`, error);
       next(error);

@@ -84,6 +84,36 @@ let VehicleRepositoryImpl = class VehicleRepositoryImpl extends BaseRepository_1
             });
         });
     }
+    findByDriverId(driverId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            console.log(`[VEHICLE REPOSITORY] Finding vehicles for driver ID: ${driverId}`);
+            try {
+                // Get vehicles assigned to this driver through the DriverVehicleAssignment relationship
+                const vehicles = yield this.prisma.vehicle.findMany({
+                    where: {
+                        assignedDrivers: {
+                            some: {
+                                driverId: driverId
+                            }
+                        }
+                    },
+                    orderBy: { createdAt: 'desc' }
+                });
+                console.log(`[VEHICLE REPOSITORY] Found ${vehicles.length} vehicles for driver ID: ${driverId}`);
+                return vehicles;
+            }
+            catch (error) {
+                console.error(`[VEHICLE REPOSITORY] Error finding vehicles by driver ID:`, error);
+                // If it's a Prisma error, log more details
+                if (error && typeof error === 'object' && 'code' in error) {
+                    console.error(`[VEHICLE REPOSITORY] Prisma error code: ${error.code}`);
+                    console.error(`[VEHICLE REPOSITORY] Prisma error message: ${error.message}`);
+                    console.error(`[VEHICLE REPOSITORY] Prisma error meta:`, error.meta);
+                }
+                throw error;
+            }
+        });
+    }
 };
 exports.VehicleRepositoryImpl = VehicleRepositoryImpl;
 exports.VehicleRepositoryImpl = VehicleRepositoryImpl = __decorate([

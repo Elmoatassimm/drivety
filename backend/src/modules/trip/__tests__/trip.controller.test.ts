@@ -62,6 +62,10 @@ describe("TripController", () => {
         driverId,
         vehicleId,
         startLocation,
+        startLatitude: null,
+        startLongitude: null,
+        endLatitude: null,
+        endLongitude: null,
         startTime: new Date(),
         endLocation: null,
         endTime: null,
@@ -81,7 +85,7 @@ describe("TripController", () => {
       );
 
       // Assert
-      expect(mockTripService.startTrip).toHaveBeenCalledWith(driverId, vehicleId, startLocation);
+      expect(mockTripService.startTrip).toHaveBeenCalledWith(driverId, vehicleId, startLocation, undefined, undefined);
       expect(mockResponseUtils.sendSuccessResponse).toHaveBeenCalledWith(
         mockResponse,
         mockTrip,
@@ -109,7 +113,7 @@ describe("TripController", () => {
       );
 
       // Assert
-      expect(mockTripService.startTrip).toHaveBeenCalledWith(driverId, vehicleId, startLocation);
+      expect(mockTripService.startTrip).toHaveBeenCalledWith(driverId, vehicleId, startLocation, undefined, undefined);
       expect(mockResponseUtils.sendSuccessResponse).not.toHaveBeenCalled();
       expect(mockNext).toHaveBeenCalledWith(error);
     });
@@ -129,6 +133,10 @@ describe("TripController", () => {
         driverId: "driver-id",
         vehicleId: "vehicle-id",
         startLocation: "Test Start Location",
+        startLatitude: null,
+        startLongitude: null,
+        endLatitude: null,
+        endLongitude: null,
         startTime: new Date(Date.now() - 3600000), // 1 hour ago
         endLocation,
         endTime: new Date(),
@@ -148,7 +156,7 @@ describe("TripController", () => {
       );
 
       // Assert
-      expect(mockTripService.endTrip).toHaveBeenCalledWith(tripId, endLocation);
+      expect(mockTripService.endTrip).toHaveBeenCalledWith(tripId, endLocation, undefined, undefined);
       expect(mockResponseUtils.sendSuccessResponse).toHaveBeenCalledWith(
         mockResponse,
         mockTrip
@@ -175,7 +183,7 @@ describe("TripController", () => {
       );
 
       // Assert
-      expect(mockTripService.endTrip).toHaveBeenCalledWith(tripId, endLocation);
+      expect(mockTripService.endTrip).toHaveBeenCalledWith(tripId, endLocation, undefined, undefined);
       expect(mockResponseUtils.sendSuccessResponse).not.toHaveBeenCalled();
       expect(mockNext).toHaveBeenCalledWith(error);
     });
@@ -223,6 +231,10 @@ describe("TripController", () => {
           driverId,
           vehicleId: "vehicle-1",
           startLocation: "Start 1",
+          startLatitude: null,
+          startLongitude: null,
+          endLatitude: null,
+          endLongitude: null,
           endLocation: "End 1",
           startTime: new Date(),
           endTime: new Date(),

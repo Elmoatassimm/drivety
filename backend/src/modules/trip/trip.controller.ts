@@ -20,10 +20,10 @@ export class TripController extends BaseController<ITrip> {
   startTrip(req: Request, res: Response, next: NextFunction): Promise<void> {
     console.log(`[TRIP CONTROLLER] Start trip request received:`, req.body);
     try {
-      const { driverId, vehicleId, startLocation } = req.body;
-      console.log(`[TRIP CONTROLLER] Starting trip for driver: ${driverId}, vehicle: ${vehicleId}`);
+      const { driverId, vehicleId, startLocation, startLatitude, startLongitude } = req.body;
+      console.log(`[TRIP CONTROLLER] Starting trip for driver: ${driverId}, vehicle: ${vehicleId}, coordinates: ${startLatitude}, ${startLongitude}`);
 
-      return this.tripService.startTrip(driverId, vehicleId, startLocation)
+      return this.tripService.startTrip(driverId, vehicleId, startLocation, startLatitude, startLongitude)
         .then(trip => {
           console.log(`[TRIP CONTROLLER] Trip started successfully with ID: ${trip.id}`);
           this.responseUtils.sendSuccessResponse(res, trip, 201);
@@ -43,10 +43,10 @@ export class TripController extends BaseController<ITrip> {
     console.log(`[TRIP CONTROLLER] End trip request received:`, req.body);
     try {
       const { tripId } = req.params;
-      const { endLocation } = req.body;
-      console.log(`[TRIP CONTROLLER] Ending trip with ID: ${tripId}`);
+      const { endLocation, endLatitude, endLongitude, distance, fuelConsumed } = req.body;
+      console.log(`[TRIP CONTROLLER] Ending trip with ID: ${tripId}, coordinates: ${endLatitude}, ${endLongitude}, distance: ${distance}, fuelConsumed: ${fuelConsumed}`);
 
-      return this.tripService.endTrip(tripId, endLocation)
+      return this.tripService.endTrip(tripId, endLocation, endLatitude, endLongitude, distance, fuelConsumed)
         .then(trip => {
           console.log(`[TRIP CONTROLLER] Trip ended successfully with ID: ${trip.id}`);
           this.responseUtils.sendSuccessResponse(res, trip);

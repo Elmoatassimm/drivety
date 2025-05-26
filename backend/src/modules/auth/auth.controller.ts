@@ -15,9 +15,9 @@ export default class AuthController {
   async register(req: Request, res: Response, next: NextFunction): Promise<void> {
     console.log(`[AUTH CONTROLLER] Register request received:`, req.body);
     try {
-      const { email, password, username } = req.body;
-      console.log(`[AUTH CONTROLLER] Calling auth service register with email: ${email}, username: ${username}`);
-      const tokens = await this.authService.register(email, password, username);
+      const { email, password, username, role } = req.body;
+      console.log(`[AUTH CONTROLLER] Calling auth service register with email: ${email}, username: ${username}, role: ${role}`);
+      const tokens = await this.authService.register(email, password, username, role);
       console.log(`[AUTH CONTROLLER] Registration successful, sending response`);
       this.responseUtils.sendSuccessResponse(res, tokens, 201);
     } catch (error) {

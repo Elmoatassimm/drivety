@@ -17,10 +17,11 @@ export default class JwtUtils {
     userId: string,
     email: string,
     username: string,
+    role: string
   ): string {
     const options = { expiresIn: this.JWT_EXPIRATION as any };
     return jwt.sign(
-      { userId, email, username },
+      { userId, email, username, role },
       String(this.JWT_SECRET),
       options
     );
@@ -35,12 +36,22 @@ export default class JwtUtils {
     );
   }
 
-  verifyAccessToken(token: string): boolean {
+  verifyAccessToken(token: string): { userId: string; email: string; role: string } | null {
     try {
-      jwt.verify(token, String(this.JWT_SECRET));
-      return true;
+      const decoded = jwt.verify(token, String(this.JWT_SECRET)) as {
+        userId: string;
+        email: string;
+        role: string;
+        iat: number;
+        exp: number;
+      };
+      return {
+        userId: decoded.userId,
+        email: decoded.email,
+        role: decoded.role
+      };
     } catch {
-      return false;
+      return null;
     }
   }
 
@@ -72,6 +83,7 @@ export default class JwtUtils {
         userId: string;
         email: string;
         username: string;
+        role: string;
       };
       return decoded;
     } catch (error) {

@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import IAuthService from "./interfaces/IAuthService";
 import IUserRepository from "../user/interfaces/IUserRepository";
 import IRefreshTokenRepository from "./interfaces/IRefreshTokenRepository";
+import { UserRole } from "../../types/user.types";
 import JwtUtils from "../../core/utils/jwt.utils";
 import { TAuthToken } from "../../types/types";
 import {
@@ -20,8 +21,8 @@ export default class AuthService implements IAuthService {
     @inject("jwt") private jwt: JwtUtils,
   ) {}
 
-  async register(email: string, password: string, username: string): Promise<TAuthToken> {
-    console.log(`[AUTH SERVICE] Register attempt for email: ${email}, username: ${username}`);
+  async register(email: string, password: string, username: string, role: UserRole = UserRole.DRIVER): Promise<TAuthToken> {
+    console.log(`[AUTH SERVICE] Register attempt for email: ${email}, username: ${username}, role: ${role}`);
     try {
       const existingUser = await this.userRepository.findByEmail(email);
       console.log(`[AUTH SERVICE] Existing user check: ${existingUser ? 'User exists' : 'User does not exist'}`);
@@ -37,6 +38,7 @@ export default class AuthService implements IAuthService {
         email,
         password_hash,
         username,
+        role
       });
       console.log(`[AUTH SERVICE] User created successfully with ID: ${user.id}`);
 
@@ -45,6 +47,7 @@ export default class AuthService implements IAuthService {
         user.id,
         user.email,
         user.username || 'user',
+        user.role
       );
       const refreshToken = this.jwt.generateRefreshToken(user.id, user.email);
       console.log(`[AUTH SERVICE] Tokens generated successfully`);
@@ -98,6 +101,7 @@ export default class AuthService implements IAuthService {
         user.id,
         user.email,
         user.username || 'user',
+        user.role
       );
       const refreshToken = this.jwt.generateRefreshToken(user.id, user.email);
       console.log(`[AUTH SERVICE] Tokens generated successfully`);
@@ -168,6 +172,7 @@ export default class AuthService implements IAuthService {
         user.id,
         user.email,
         user.username || 'user',
+        user.role || 'user',
       );
       const newRefreshToken = this.jwt.generateRefreshToken(
         user.id,

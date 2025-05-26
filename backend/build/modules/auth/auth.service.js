@@ -26,6 +26,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const tsyringe_1 = require("tsyringe");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
+const user_types_1 = require("../../types/user.types");
 const jwt_utils_1 = __importDefault(require("../../core/utils/jwt.utils"));
 const AppError_1 = require("../../core/errors/AppError");
 let AuthService = class AuthService {
@@ -34,9 +35,9 @@ let AuthService = class AuthService {
         this.refreshTokenRepository = refreshTokenRepository;
         this.jwt = jwt;
     }
-    register(email, password, username) {
-        return __awaiter(this, void 0, void 0, function* () {
-            console.log(`[AUTH SERVICE] Register attempt for email: ${email}, username: ${username}`);
+    register(email_1, password_1, username_1) {
+        return __awaiter(this, arguments, void 0, function* (email, password, username, role = user_types_1.UserRole.DRIVER) {
+            console.log(`[AUTH SERVICE] Register attempt for email: ${email}, username: ${username}, role: ${role}`);
             try {
                 const existingUser = yield this.userRepository.findByEmail(email);
                 console.log(`[AUTH SERVICE] Existing user check: ${existingUser ? 'User exists' : 'User does not exist'}`);
@@ -50,10 +51,11 @@ let AuthService = class AuthService {
                     email,
                     password_hash,
                     username,
+                    role
                 });
                 console.log(`[AUTH SERVICE] User created successfully with ID: ${user.id}`);
                 console.log(`[AUTH SERVICE] Generating tokens...`);
-                const accessToken = this.jwt.generateAccessToken(user.id, user.email, user.username || 'user');
+                const accessToken = this.jwt.generateAccessToken(user.id, user.email, user.username || 'user', user.role);
                 const refreshToken = this.jwt.generateRefreshToken(user.id, user.email);
                 console.log(`[AUTH SERVICE] Tokens generated successfully`);
                 const expiresAt = new Date();
@@ -93,7 +95,7 @@ let AuthService = class AuthService {
                 if (!isPasswordValid)
                     throw new AppError_1.UnauthorizedError("Invalid credentials");
                 console.log(`[AUTH SERVICE] Generating tokens...`);
-                const accessToken = this.jwt.generateAccessToken(user.id, user.email, user.username || 'user');
+                const accessToken = this.jwt.generateAccessToken(user.id, user.email, user.username || 'user', user.role);
                 const refreshToken = this.jwt.generateRefreshToken(user.id, user.email);
                 console.log(`[AUTH SERVICE] Tokens generated successfully`);
                 const expiresAt = new Date();
@@ -145,7 +147,7 @@ let AuthService = class AuthService {
                 if (!user)
                     throw new AppError_1.NotFoundError("User");
                 console.log(`[AUTH SERVICE] Generating new tokens...`);
-                const newAccessToken = this.jwt.generateAccessToken(user.id, user.email, user.username || 'user');
+                const newAccessToken = this.jwt.generateAccessToken(user.id, user.email, user.username || 'user', user.role || 'user');
                 const newRefreshToken = this.jwt.generateRefreshToken(user.id, user.email);
                 console.log(`[AUTH SERVICE] New tokens generated successfully`);
                 const expiresAt = new Date();

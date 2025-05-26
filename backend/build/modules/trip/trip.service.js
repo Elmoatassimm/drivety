@@ -32,20 +32,17 @@ let TripService = class TripService extends BaseService_1.BaseService {
         this.tripRepository = tripRepository;
         this.entityName = "Trip";
     }
-    startTrip(driverId, vehicleId, startLocation) {
+    startTrip(driverId, vehicleId, startLocation, startLatitude, startLongitude) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log(`[TRIP SERVICE] Starting trip for driver: ${driverId}, vehicle: ${vehicleId}`);
+            console.log(`[TRIP SERVICE] Starting trip for driver: ${driverId}, vehicle: ${vehicleId}, coordinates: ${startLatitude}, ${startLongitude}`);
             if (!driverId) {
                 throw new AppError_1.BadRequestError("Driver ID is required");
             }
             if (!vehicleId) {
                 throw new AppError_1.BadRequestError("Vehicle ID is required");
             }
-            if (!startLocation) {
-                throw new AppError_1.BadRequestError("Start location is required");
-            }
             try {
-                return yield this.tripRepository.startTrip(driverId, vehicleId, startLocation);
+                return yield this.tripRepository.startTrip(driverId, vehicleId, startLocation, startLatitude, startLongitude);
             }
             catch (error) {
                 console.error(`[TRIP SERVICE] Error starting trip:`, error);
@@ -53,17 +50,14 @@ let TripService = class TripService extends BaseService_1.BaseService {
             }
         });
     }
-    endTrip(tripId, endLocation) {
+    endTrip(tripId, endLocation, endLatitude, endLongitude, distance, fuelConsumed) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log(`[TRIP SERVICE] Ending trip with ID: ${tripId}`);
+            console.log(`[TRIP SERVICE] Ending trip with ID: ${tripId}, coordinates: ${endLatitude}, ${endLongitude}, distance: ${distance}, fuelConsumed: ${fuelConsumed}`);
             if (!tripId) {
                 throw new AppError_1.BadRequestError("Trip ID is required");
             }
-            if (!endLocation) {
-                throw new AppError_1.BadRequestError("End location is required");
-            }
             try {
-                return yield this.tripRepository.endTrip(tripId, endLocation);
+                return yield this.tripRepository.endTrip(tripId, endLocation, endLatitude, endLongitude, distance, fuelConsumed);
             }
             catch (error) {
                 console.error(`[TRIP SERVICE] Error ending trip:`, error);

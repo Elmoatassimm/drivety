@@ -13,10 +13,10 @@ export default interface ITripRepository {
   create(data: Omit<ITrip, "id" | "updatedAt">): Promise<ITrip>;
   update(id: string, data: Partial<Omit<ITrip, "id" | "updatedAt">>): Promise<ITrip>;
   delete(id: string): Promise<ITrip>;
-  
+
   // Custom methods for trip module
-  startTrip(driverId: string, vehicleId: string, startLocation: string): Promise<ITrip>;
-  endTrip(tripId: string, endLocation: string): Promise<ITrip>;
+  startTrip(driverId: string, vehicleId: string, startLocation?: string, startLatitude?: number, startLongitude?: number): Promise<ITrip>;
+  endTrip(tripId: string, endLocation?: string, endLatitude?: number, endLongitude?: number, distance?: number, fuelConsumed?: number): Promise<ITrip>;
   getTripMetrics(tripId: string): Promise<any[]>;
   getDriverTrips(driverId: string): Promise<ITrip[]>;
 }

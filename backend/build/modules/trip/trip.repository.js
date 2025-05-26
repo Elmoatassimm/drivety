@@ -35,9 +35,9 @@ let TripRepository = class TripRepository extends BaseRepository_1.BaseRepositor
         this.modelName = "trip";
         console.log(`[TRIP REPOSITORY] Initialized with model name: ${this.modelName}`);
     }
-    startTrip(driverId, vehicleId, startLocation) {
+    startTrip(driverId, vehicleId, startLocation, startLatitude, startLongitude) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log(`[TRIP REPOSITORY] Starting trip for driver: ${driverId}, vehicle: ${vehicleId}`);
+            console.log(`[TRIP REPOSITORY] Starting trip for driver: ${driverId}, vehicle: ${vehicleId}, coordinates: ${startLatitude}, ${startLongitude}`);
             try {
                 // Check if driver exists
                 const driver = yield this.prisma.driver.findUnique({
@@ -59,11 +59,13 @@ let TripRepository = class TripRepository extends BaseRepository_1.BaseRepositor
                         driverId,
                         vehicleId,
                         startLocation,
+                        startLatitude,
+                        startLongitude,
                         startTime: new Date(),
                         status: "IN_PROGRESS"
                     }
                 });
-                console.log(`[TRIP REPOSITORY] Trip started successfully with ID: ${trip.id}`);
+                console.log(`[TRIP REPOSITORY] Trip started successfully with ID: ${trip}`);
                 return trip;
             }
             catch (error) {
@@ -72,9 +74,9 @@ let TripRepository = class TripRepository extends BaseRepository_1.BaseRepositor
             }
         });
     }
-    endTrip(tripId, endLocation) {
+    endTrip(tripId, endLocation, endLatitude, endLongitude, distance, fuelConsumed) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log(`[TRIP REPOSITORY] Ending trip with ID: ${tripId}`);
+            console.log(`[TRIP REPOSITORY] Ending trip with ID: ${tripId}, coordinates: ${endLatitude}, ${endLongitude}, distance: ${distance}, fuelConsumed: ${fuelConsumed}`);
             try {
                 // Check if trip exists and is in progress
                 const trip = yield this.prisma.trip.findUnique({
@@ -94,12 +96,15 @@ let TripRepository = class TripRepository extends BaseRepository_1.BaseRepositor
                     where: { id: tripId },
                     data: {
                         endLocation,
+                        endLatitude,
+                        endLongitude,
                         endTime,
+                        distance,
+                        fuelConsumed,
                         status: "COMPLETED"
-                        // We'll calculate distance and fuel consumed in a real implementation
                     }
                 });
-                console.log(`[TRIP REPOSITORY] Trip ended successfully with ID: ${updatedTrip.id}`);
+                console.log(`[TRIP REPOSITORY] Trip ended successfully with ID: ${updatedTrip}`);
                 return updatedTrip;
             }
             catch (error) {

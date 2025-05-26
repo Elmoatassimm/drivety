@@ -31,9 +31,10 @@ const driver_service_1 = require("./driver.service");
 const response_utils_1 = __importDefault(require("../../core/utils/response.utils"));
 const AppError_1 = require("../../core/errors/AppError");
 let DriverController = class DriverController extends BaseController_1.BaseController {
-    constructor(driverService, responseUtils) {
+    constructor(driverService, vehicleService, responseUtils) {
         super(driverService, responseUtils);
         this.driverService = driverService;
+        this.vehicleService = vehicleService;
     }
     createDriver(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -116,8 +117,13 @@ let DriverController = class DriverController extends BaseController_1.BaseContr
                     console.log(`[DRIVER CONTROLLER] No driver found for current user ID: ${req.user.id}`);
                     throw new AppError_1.NotFoundError("Driver not found for current user");
                 }
-                console.log(`[DRIVER CONTROLLER] Returning driver with ID: ${driver.id} for current user`);
-                this.responseUtils.sendSuccessResponse(res, driver);
+                console.log(`[DRIVER CONTROLLER] Looking up vehicles for driver ID: ${driver.id}`);
+                const vehicles = yield this.vehicleService.findByDriverId(driver.id);
+                console.log(`[DRIVER CONTROLLER] Found ${vehicles.length} vehicles for driver ID: ${driver.id}`);
+                // Combine driver information with vehicles
+                const response = Object.assign(Object.assign({}, driver), { vehicles: vehicles });
+                console.log(`[DRIVER CONTROLLER] Returning driver with ID: ${driver.id} and ${vehicles.length} vehicles for current user`);
+                this.responseUtils.sendSuccessResponse(res, response);
             }
             catch (error) {
                 console.error(`[DRIVER CONTROLLER] Error getting current user driver:`, error);
@@ -130,7 +136,7 @@ exports.DriverController = DriverController;
 exports.DriverController = DriverController = __decorate([
     (0, tsyringe_1.injectable)(),
     __param(0, (0, tsyringe_1.inject)("IDriverService")),
-    __param(1, (0, tsyringe_1.inject)("responseUtils")),
-    __metadata("design:paramtypes", [driver_service_1.DriverService,
-        response_utils_1.default])
+    __param(1, (0, tsyringe_1.inject)("IVehicleService")),
+    __param(2, (0, tsyringe_1.inject)("responseUtils")),
+    __metadata("design:paramtypes", [driver_service_1.DriverService, Object, response_utils_1.default])
 ], DriverController);

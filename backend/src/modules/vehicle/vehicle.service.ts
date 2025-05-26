@@ -68,6 +68,19 @@ export class VehicleService extends BaseService<IVehicle> implements IVehicleSer
     }
   }
 
+  async findByDriverId(driverId: string): Promise<IVehicle[]> {
+    if (!driverId) {
+      throw new BadRequestError("Driver ID is required");
+    }
+
+    try {
+      return await this.vehicleRepository.findByDriverId(driverId);
+    } catch (error) {
+      this.logger.error(`Error getting vehicles for driver ${driverId}`, { error });
+      throw this.handleError(error, `Failed to get vehicles for driver ${driverId}`);
+    }
+  }
+
   // Override validateCreate to add custom validation for vehicle creation
   protected async validateCreate(data: Omit<IVehicle, "id" | "createdAt" | "updatedAt">): Promise<void> {
     if (!data.model) {

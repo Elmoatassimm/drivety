@@ -14,4 +14,5 @@ export default interface IVehicleService {
   getComponents(vehicleId: string): Promise<any[]>;
   updateHealthStatus(vehicleId: string, healthStatus: string): Promise<{ id: string; healthStatus: string }>;
   getMaintenanceHistory(vehicleId: string): Promise<any[]>;
+  findByDriverId(driverId: string): Promise<IVehicle[]>;
 }

@@ -50,9 +50,9 @@ let JwtUtils = class JwtUtils {
         this.REFRESH_TOKEN_SECRET = (_b = process.env.REFRESH_TOKEN_SECRET) !== null && _b !== void 0 ? _b : "your-refresh-secret";
         this.REFRESH_TOKEN_EXPIRY = process.env.REFRESH_TOKEN_EXPIRY || "15d";
     }
-    generateAccessToken(userId, email, username) {
+    generateAccessToken(userId, email, username, role) {
         const options = { expiresIn: this.JWT_EXPIRATION };
-        return jwt.sign({ userId, email, username }, String(this.JWT_SECRET), options);
+        return jwt.sign({ userId, email, username, role }, String(this.JWT_SECRET), options);
     }
     generateRefreshToken(userId, email) {
         const options = { expiresIn: this.REFRESH_TOKEN_EXPIRY };
@@ -60,11 +60,15 @@ let JwtUtils = class JwtUtils {
     }
     verifyAccessToken(token) {
         try {
-            jwt.verify(token, String(this.JWT_SECRET));
-            return true;
+            const decoded = jwt.verify(token, String(this.JWT_SECRET));
+            return {
+                userId: decoded.userId,
+                email: decoded.email,
+                role: decoded.role
+            };
         }
         catch (_a) {
-            return false;
+            return null;
         }
     }
     verifyRefreshToken(token) {

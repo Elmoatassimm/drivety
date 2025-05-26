@@ -1,5 +1,6 @@
 import { User } from "@prisma/client";
 import { Request } from "express";
+import { UserRole } from "./user.types";
 
 // Auth types
 export type TUserData = User;
@@ -15,7 +16,7 @@ export type RequestWithUser = Request & {
     userId?: string;
     email: string;
     username?: string;
-    role?: string;
+    role: UserRole;
   }
 };
 

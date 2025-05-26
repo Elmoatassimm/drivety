@@ -38,6 +38,10 @@ describe("TripService", () => {
         driverId,
         vehicleId,
         startLocation,
+        startLatitude: null,
+        startLongitude: null,
+        endLatitude: null,
+        endLongitude: null,
         startTime: new Date(),
         endLocation: null,
         endTime: null,
@@ -53,8 +57,60 @@ describe("TripService", () => {
       const result = await tripService.startTrip(driverId, vehicleId, startLocation);
 
       // Assert
-      expect(mockTripRepository.startTrip).toHaveBeenCalledWith(driverId, vehicleId, startLocation);
+      expect(mockTripRepository.startTrip).toHaveBeenCalledWith(driverId, vehicleId, startLocation, undefined, undefined);
       expect(result).toEqual(mockTrip);
+    });
+
+    it("should start a trip with coordinates", async () => {
+      // Arrange
+      const driverId = "driver-id";
+      const vehicleId = "vehicle-id";
+      const startLocation = "Test Start Location";
+      const startLatitude = 40.7128;
+      const startLongitude = -74.0060;
+
+      const mockTrip: ITrip = {
+        id: "trip-id",
+        driverId,
+        vehicleId,
+        startLocation,
+        startLatitude,
+        startLongitude,
+        endLatitude: null,
+        endLongitude: null,
+        startTime: new Date(),
+        endLocation: null,
+        endTime: null,
+        distance: null,
+        fuelConsumed: null,
+        status: "IN_PROGRESS",
+        updatedAt: new Date()
+      };
+
+      mockTripRepository.startTrip.mockResolvedValue(mockTrip);
+
+      // Act
+      const result = await tripService.startTrip(driverId, vehicleId, startLocation, startLatitude, startLongitude);
+
+      // Assert
+      expect(mockTripRepository.startTrip).toHaveBeenCalledWith(driverId, vehicleId, startLocation, startLatitude, startLongitude);
+      expect(result).toEqual(mockTrip);
+      expect(result.startLatitude).toBe(startLatitude);
+      expect(result.startLongitude).toBe(startLongitude);
+    });
+
+    it("should throw BadRequestError for invalid coordinates", async () => {
+      // Arrange
+      const driverId = "driver-id";
+      const vehicleId = "vehicle-id";
+      const startLocation = "Test Start Location";
+      const invalidLatitude = 95; // > 90
+      const validLongitude = -74.0060;
+
+      // Act & Assert
+      await expect(tripService.startTrip(driverId, vehicleId, startLocation, invalidLatitude, validLongitude))
+        .rejects.toThrow(BadRequestError);
+      expect(mockTripRepository.startTrip).not.toHaveBeenCalled();
     });
 
     it("should throw BadRequestError if driverId is missing", async () => {
@@ -105,6 +161,10 @@ describe("TripService", () => {
         driverId: "driver-id",
         vehicleId: "vehicle-id",
         startLocation: "Test Start Location",
+        startLatitude: null,
+        startLongitude: null,
+        endLatitude: null,
+        endLongitude: null,
         startTime: new Date(Date.now() - 3600000), // 1 hour ago
         endLocation,
         endTime: new Date(),
@@ -120,8 +180,58 @@ describe("TripService", () => {
       const result = await tripService.endTrip(tripId, endLocation);
 
       // Assert
-      expect(mockTripRepository.endTrip).toHaveBeenCalledWith(tripId, endLocation);
+      expect(mockTripRepository.endTrip).toHaveBeenCalledWith(tripId, endLocation, undefined, undefined);
       expect(result).toEqual(mockTrip);
+    });
+
+    it("should end a trip with coordinates", async () => {
+      // Arrange
+      const tripId = "trip-id";
+      const endLocation = "Test End Location";
+      const endLatitude = 40.7589;
+      const endLongitude = -73.9851;
+
+      const mockTrip: ITrip = {
+        id: tripId,
+        driverId: "driver-id",
+        vehicleId: "vehicle-id",
+        startLocation: "Test Start Location",
+        startLatitude: 40.7128,
+        startLongitude: -74.0060,
+        endLatitude,
+        endLongitude,
+        startTime: new Date(Date.now() - 3600000), // 1 hour ago
+        endLocation,
+        endTime: new Date(),
+        distance: 50.5,
+        fuelConsumed: 5.2,
+        status: "COMPLETED",
+        updatedAt: new Date()
+      };
+
+      mockTripRepository.endTrip.mockResolvedValue(mockTrip);
+
+      // Act
+      const result = await tripService.endTrip(tripId, endLocation, endLatitude, endLongitude);
+
+      // Assert
+      expect(mockTripRepository.endTrip).toHaveBeenCalledWith(tripId, endLocation, endLatitude, endLongitude);
+      expect(result).toEqual(mockTrip);
+      expect(result.endLatitude).toBe(endLatitude);
+      expect(result.endLongitude).toBe(endLongitude);
+    });
+
+    it("should throw BadRequestError for invalid end coordinates", async () => {
+      // Arrange
+      const tripId = "trip-id";
+      const endLocation = "Test End Location";
+      const invalidLatitude = -95; // < -90
+      const validLongitude = -73.9851;
+
+      // Act & Assert
+      await expect(tripService.endTrip(tripId, endLocation, invalidLatitude, validLongitude))
+        .rejects.toThrow(BadRequestError);
+      expect(mockTripRepository.endTrip).not.toHaveBeenCalled();
     });
 
     it("should throw BadRequestError if tripId is missing", async () => {
@@ -187,6 +297,10 @@ describe("TripService", () => {
           driverId,
           vehicleId: "vehicle-1",
           startLocation: "Start 1",
+          startLatitude: null,
+          startLongitude: null,
+          endLatitude: null,
+          endLongitude: null,
           endLocation: "End 1",
           startTime: new Date(),
           endTime: new Date(),
@@ -200,6 +314,10 @@ describe("TripService", () => {
           driverId,
           vehicleId: "vehicle-2",
           startLocation: "Start 2",
+          startLatitude: null,
+          startLongitude: null,
+          endLatitude: null,
+          endLongitude: null,
           endLocation: null,
           startTime: new Date(),
           endTime: null,

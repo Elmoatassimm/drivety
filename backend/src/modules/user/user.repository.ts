@@ -1,8 +1,9 @@
 import { injectable, inject } from "tsyringe";
 import { BaseRepository } from "../../core/base/BaseRepository";
-import { IUser } from "./interfaces/IUserRepository";
+import { IUser, CreateUserData } from "./interfaces/IUserRepository";
 import PrismaService from "../../config/db";
 import IUserRepository from "./interfaces/IUserRepository";
+import { UserRole } from "../../types/user.types";
 
 @injectable()
 export class UserRepository extends BaseRepository<IUser> implements IUserRepository {
@@ -18,7 +19,9 @@ export class UserRepository extends BaseRepository<IUser> implements IUserReposi
     try {
       const user = await this.prisma.user.findUnique({ where: { id } });
       console.log(`[USER REPOSITORY] User found by ID: ${!!user}`);
-      return user;
+      if (!user) return null;
+      
+      return this.mapToIUser(user);
     } catch (error: any) {
       console.error(`[USER REPOSITORY] Error finding user by ID:`, error);
       // If it's a Prisma error, log more details
@@ -36,7 +39,9 @@ export class UserRepository extends BaseRepository<IUser> implements IUserReposi
     try {
       const user = await this.prisma.user.findUnique({ where: { email } });
       console.log(`[USER REPOSITORY] User found by email: ${!!user}`);
-      return user;
+      if (!user) return null;
+      
+      return this.mapToIUser(user);
     } catch (error: any) {
       console.error(`[USER REPOSITORY] Error finding user by email:`, error);
       // If it's a Prisma error, log more details
@@ -49,12 +54,17 @@ export class UserRepository extends BaseRepository<IUser> implements IUserReposi
     }
   }
 
-  async createUser(data: { email: string; password_hash: string; username: string }): Promise<IUser> {
+  async createUser(data: CreateUserData): Promise<IUser> {
     console.log(`[USER REPOSITORY] Creating user with email: ${data.email}`);
     try {
+      // Ensure role is a valid UserRole or default to DRIVER
+      const role = (data.role && Object.values(UserRole).includes(data.role as UserRole))
+        ? data.role as UserRole
+        : UserRole.DRIVER;
+      
       console.log(`[USER REPOSITORY] User data:`, {
         email: data.email,
-        username: data.username,
+        role,
         password_hash_length: data.password_hash ? data.password_hash.length : 0
       });
 
@@ -71,15 +81,17 @@ export class UserRepository extends BaseRepository<IUser> implements IUserReposi
         data: {
           email: data.email,
           password: data.password_hash,
-          role: "USER"
+          role: role  // Explicitly set the role
         }
       });
       console.log(`[USER REPOSITORY] User created successfully with ID: ${user.id}`);
 
-      // Add the username property to match the interface
+      // Map to IUser interface
       return {
         ...user,
-        username: data.username
+        username: data.username,
+        role: role,
+        password_hash: user.password
       };
     } catch (error: any) {
       console.error(`[USER REPOSITORY] Error creating user:`, error);
@@ -93,6 +105,15 @@ export class UserRepository extends BaseRepository<IUser> implements IUserReposi
     }
   }
 
+  private mapToIUser(user: any): IUser {
+    return {
+      ...user,
+      role: user.role as UserRole,
+      password_hash: user.password || user.password_hash,
+      username: undefined // Not stored in the database
+    };
+  }
+
   async updatePassword(id: string, password: string): Promise<IUser> {
     console.log(`[USER REPOSITORY] Updating password for user ID: ${id}`);
     try {
@@ -100,8 +121,8 @@ export class UserRepository extends BaseRepository<IUser> implements IUserReposi
         where: { id },
         data: { password }
       });
-      console.log(`[USER REPOSITORY] Password updated successfully for user ID: ${id}`);
-      return user;
+      console.log(`[USER REPOSITORY] Password updated successfully`);
+      return this.mapToIUser(user);
     } catch (error: any) {
       console.error(`[USER REPOSITORY] Error updating password:`, error);
       // If it's a Prisma error, log more details
@@ -117,20 +138,24 @@ export class UserRepository extends BaseRepository<IUser> implements IUserReposi
   async getProfile(id: string): Promise<Partial<IUser> | null> {
     console.log(`[USER REPOSITORY] Getting profile for user ID: ${id}`);
     try {
-      const profile = await this.prisma.user.findUnique({
+      const user = await this.prisma.user.findUnique({
         where: { id },
-        select: { id: true, email: true, role: true }
+        select: {
+          id: true,
+          email: true,
+          role: true,
+        },
       });
-      console.log(`[USER REPOSITORY] Profile found: ${!!profile}`);
-      return profile;
-    } catch (error: any) {
+      console.log(`[USER REPOSITORY] Profile found: ${!!user}`);
+      if (!user) return null;
+      
+      return {
+        ...user,
+        role: user.role as UserRole,
+        username: undefined // Not stored in the database
+      };
+    } catch (error) {
       console.error(`[USER REPOSITORY] Error getting profile:`, error);
-      // If it's a Prisma error, log more details
-      if (error && typeof error === 'object' && 'code' in error) {
-        console.error(`[USER REPOSITORY] Prisma error code: ${error.code}`);
-        console.error(`[USER REPOSITORY] Prisma error message: ${error.message}`);
-        console.error(`[USER REPOSITORY] Prisma error meta:`, error.meta);
-      }
       throw error;
     }
   }

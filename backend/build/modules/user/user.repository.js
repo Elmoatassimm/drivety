@@ -28,6 +28,7 @@ exports.UserRepository = void 0;
 const tsyringe_1 = require("tsyringe");
 const BaseRepository_1 = require("../../core/base/BaseRepository");
 const db_1 = __importDefault(require("../../config/db"));
+const user_types_1 = require("../../types/user.types");
 let UserRepository = class UserRepository extends BaseRepository_1.BaseRepository {
     constructor(prismaService) {
         super(prismaService);
@@ -40,7 +41,9 @@ let UserRepository = class UserRepository extends BaseRepository_1.BaseRepositor
             try {
                 const user = yield this.prisma.user.findUnique({ where: { id } });
                 console.log(`[USER REPOSITORY] User found by ID: ${!!user}`);
-                return user;
+                if (!user)
+                    return null;
+                return this.mapToIUser(user);
             }
             catch (error) {
                 console.error(`[USER REPOSITORY] Error finding user by ID:`, error);
@@ -60,7 +63,9 @@ let UserRepository = class UserRepository extends BaseRepository_1.BaseRepositor
             try {
                 const user = yield this.prisma.user.findUnique({ where: { email } });
                 console.log(`[USER REPOSITORY] User found by email: ${!!user}`);
-                return user;
+                if (!user)
+                    return null;
+                return this.mapToIUser(user);
             }
             catch (error) {
                 console.error(`[USER REPOSITORY] Error finding user by email:`, error);
@@ -78,9 +83,13 @@ let UserRepository = class UserRepository extends BaseRepository_1.BaseRepositor
         return __awaiter(this, void 0, void 0, function* () {
             console.log(`[USER REPOSITORY] Creating user with email: ${data.email}`);
             try {
+                // Ensure role is a valid UserRole or default to DRIVER
+                const role = (data.role && Object.values(user_types_1.UserRole).includes(data.role))
+                    ? data.role
+                    : user_types_1.UserRole.DRIVER;
                 console.log(`[USER REPOSITORY] User data:`, {
                     email: data.email,
-                    username: data.username,
+                    role,
                     password_hash_length: data.password_hash ? data.password_hash.length : 0
                 });
                 // Log the Prisma client connection status
@@ -94,12 +103,12 @@ let UserRepository = class UserRepository extends BaseRepository_1.BaseRepositor
                     data: {
                         email: data.email,
                         password: data.password_hash,
-                        role: "USER"
+                        role: role // Explicitly set the role
                     }
                 });
                 console.log(`[USER REPOSITORY] User created successfully with ID: ${user.id}`);
-                // Add the username property to match the interface
-                return Object.assign(Object.assign({}, user), { username: data.username });
+                // Map to IUser interface
+                return Object.assign(Object.assign({}, user), { username: data.username, role: role, password_hash: user.password });
             }
             catch (error) {
                 console.error(`[USER REPOSITORY] Error creating user:`, error);
@@ -113,6 +122,10 @@ let UserRepository = class UserRepository extends BaseRepository_1.BaseRepositor
             }
         });
     }
+    mapToIUser(user) {
+        return Object.assign(Object.assign({}, user), { role: user.role, password_hash: user.password || user.password_hash, username: undefined // Not stored in the database
+         });
+    }
     updatePassword(id, password) {
         return __awaiter(this, void 0, void 0, function* () {
             console.log(`[USER REPOSITORY] Updating password for user ID: ${id}`);
@@ -121,8 +134,8 @@ let UserRepository = class UserRepository extends BaseRepository_1.BaseRepositor
                     where: { id },
                     data: { password }
                 });
-                console.log(`[USER REPOSITORY] Password updated successfully for user ID: ${id}`);
-                return user;
+                console.log(`[USER REPOSITORY] Password updated successfully`);
+                return this.mapToIUser(user);
             }
             catch (error) {
                 console.error(`[USER REPOSITORY] Error updating password:`, error);
@@ -140,21 +153,22 @@ let UserRepository = class UserRepository extends BaseRepository_1.BaseRepositor
         return __awaiter(this, void 0, void 0, function* () {
             console.log(`[USER REPOSITORY] Getting profile for user ID: ${id}`);
             try {
-                const profile = yield this.prisma.user.findUnique({
+                const user = yield this.prisma.user.findUnique({
                     where: { id },
-                    select: { id: true, email: true, role: true }
+                    select: {
+                        id: true,
+                        email: true,
+                        role: true,
+                    },
                 });
-                console.log(`[USER REPOSITORY] Profile found: ${!!profile}`);
-                return profile;
+                console.log(`[USER REPOSITORY] Profile found: ${!!user}`);
+                if (!user)
+                    return null;
+                return Object.assign(Object.assign({}, user), { role: user.role, username: undefined // Not stored in the database
+                 });
             }
             catch (error) {
                 console.error(`[USER REPOSITORY] Error getting profile:`, error);
-                // If it's a Prisma error, log more details
-                if (error && typeof error === 'object' && 'code' in error) {
-                    console.error(`[USER REPOSITORY] Prisma error code: ${error.code}`);
-                    console.error(`[USER REPOSITORY] Prisma error message: ${error.message}`);
-                    console.error(`[USER REPOSITORY] Prisma error meta:`, error.meta);
-                }
                 throw error;
             }
         });

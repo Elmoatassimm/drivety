@@ -28,9 +28,9 @@ let TripController = class TripController extends BaseController_1.BaseControlle
     startTrip(req, res, next) {
         console.log(`[TRIP CONTROLLER] Start trip request received:`, req.body);
         try {
-            const { driverId, vehicleId, startLocation } = req.body;
-            console.log(`[TRIP CONTROLLER] Starting trip for driver: ${driverId}, vehicle: ${vehicleId}`);
-            return this.tripService.startTrip(driverId, vehicleId, startLocation)
+            const { driverId, vehicleId, startLocation, startLatitude, startLongitude } = req.body;
+            console.log(`[TRIP CONTROLLER] Starting trip for driver: ${driverId}, vehicle: ${vehicleId}, coordinates: ${startLatitude}, ${startLongitude}`);
+            return this.tripService.startTrip(driverId, vehicleId, startLocation, startLatitude, startLongitude)
                 .then(trip => {
                 console.log(`[TRIP CONTROLLER] Trip started successfully with ID: ${trip.id}`);
                 this.responseUtils.sendSuccessResponse(res, trip, 201);
@@ -50,9 +50,9 @@ let TripController = class TripController extends BaseController_1.BaseControlle
         console.log(`[TRIP CONTROLLER] End trip request received:`, req.body);
         try {
             const { tripId } = req.params;
-            const { endLocation } = req.body;
-            console.log(`[TRIP CONTROLLER] Ending trip with ID: ${tripId}`);
-            return this.tripService.endTrip(tripId, endLocation)
+            const { endLocation, endLatitude, endLongitude, distance, fuelConsumed } = req.body;
+            console.log(`[TRIP CONTROLLER] Ending trip with ID: ${tripId}, coordinates: ${endLatitude}, ${endLongitude}, distance: ${distance}, fuelConsumed: ${fuelConsumed}`);
+            return this.tripService.endTrip(tripId, endLocation, endLatitude, endLongitude, distance, fuelConsumed)
                 .then(trip => {
                 console.log(`[TRIP CONTROLLER] Trip ended successfully with ID: ${trip.id}`);
                 this.responseUtils.sendSuccessResponse(res, trip);

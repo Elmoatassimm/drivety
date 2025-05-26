@@ -7,11 +7,16 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum UserRole {
+  ADMIN
+  DRIVER
+}
+
 model User {
   id            String         @id @default(uuid())
   email         String         @unique
   password      String
-  role          String
+  role          UserRole       @default(DRIVER)
   createdAt     DateTime       @default(now()) @map("created_at")
   updatedAt     DateTime       @updatedAt @map("updated_at")
   driver        Driver?
@@ -107,8 +112,12 @@ model Trip {
   id                String             @id @default(uuid())
   vehicleId         String             @map("vehicle_id")
   driverId          String             @map("driver_id")
-  startLocation     String             @map("start_location") @db.LongText
+  startLocation     String?             @map("start_location") @db.LongText
   endLocation       String?            @map("end_location") @db.LongText
+  startLatitude     Float?             @map("start_latitude")
+  startLongitude    Float?             @map("start_longitude")
+  endLatitude       Float?             @map("end_latitude")
+  endLongitude      Float?             @map("end_longitude")
   startTime         DateTime           @map("start_time")
   endTime           DateTime?          @map("end_time")
   distance          Float?

@@ -83,6 +83,20 @@ let VehicleService = class VehicleService extends BaseService_1.BaseService {
             }
         });
     }
+    findByDriverId(driverId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!driverId) {
+                throw new AppError_1.BadRequestError("Driver ID is required");
+            }
+            try {
+                return yield this.vehicleRepository.findByDriverId(driverId);
+            }
+            catch (error) {
+                this.logger.error(`Error getting vehicles for driver ${driverId}`, { error });
+                throw this.handleError(error, `Failed to get vehicles for driver ${driverId}`);
+            }
+        });
+    }
     // Override validateCreate to add custom validation for vehicle creation
     validateCreate(data) {
         return __awaiter(this, void 0, void 0, function* () {

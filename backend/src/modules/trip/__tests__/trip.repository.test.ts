@@ -43,16 +43,16 @@ describe("TripRepository", () => {
       const driverId = "driver-id";
       const vehicleId = "vehicle-id";
       const startLocation = "Test Start Location";
-      
+
       const mockDriver = { id: driverId, name: "Test Driver" };
       const mockVehicle = { id: vehicleId, model: "Test Vehicle" };
-      const mockTrip = { 
-        id: "trip-id", 
-        driverId, 
-        vehicleId, 
-        startLocation, 
+      const mockTrip = {
+        id: "trip-id",
+        driverId,
+        vehicleId,
+        startLocation,
         startTime: new Date(),
-        status: "IN_PROGRESS" 
+        status: "IN_PROGRESS"
       };
 
       mockPrismaClient.driver.findUnique.mockResolvedValue(mockDriver);
@@ -74,6 +74,51 @@ describe("TripRepository", () => {
           driverId,
           vehicleId,
           startLocation,
+          startLatitude: undefined,
+          startLongitude: undefined,
+          startTime: expect.any(Date),
+          status: "IN_PROGRESS",
+        },
+      });
+      expect(result).toEqual(mockTrip);
+    });
+
+    it("should start a trip with coordinates", async () => {
+      // Arrange
+      const driverId = "driver-id";
+      const vehicleId = "vehicle-id";
+      const startLocation = "Test Start Location";
+      const startLatitude = 40.7128;
+      const startLongitude = -74.0060;
+
+      const mockDriver = { id: driverId, name: "Test Driver" };
+      const mockVehicle = { id: vehicleId, model: "Test Vehicle" };
+      const mockTrip = {
+        id: "trip-id",
+        driverId,
+        vehicleId,
+        startLocation,
+        startLatitude,
+        startLongitude,
+        startTime: new Date(),
+        status: "IN_PROGRESS"
+      };
+
+      mockPrismaClient.driver.findUnique.mockResolvedValue(mockDriver);
+      mockPrismaClient.vehicle.findUnique.mockResolvedValue(mockVehicle);
+      mockPrismaClient.trip.create.mockResolvedValue(mockTrip);
+
+      // Act
+      const result = await tripRepository.startTrip(driverId, vehicleId, startLocation, startLatitude, startLongitude);
+
+      // Assert
+      expect(mockPrismaClient.trip.create).toHaveBeenCalledWith({
+        data: {
+          driverId,
+          vehicleId,
+          startLocation,
+          startLatitude,
+          startLongitude,
           startTime: expect.any(Date),
           status: "IN_PROGRESS",
         },
@@ -99,7 +144,7 @@ describe("TripRepository", () => {
       const driverId = "driver-id";
       const vehicleId = "invalid-vehicle-id";
       const startLocation = "Test Start Location";
-      
+
       const mockDriver = { id: driverId, name: "Test Driver" };
 
       mockPrismaClient.driver.findUnique.mockResolvedValue(mockDriver);
@@ -116,21 +161,21 @@ describe("TripRepository", () => {
       // Arrange
       const tripId = "trip-id";
       const endLocation = "Test End Location";
-      
-      const mockTrip = { 
-        id: tripId, 
-        driverId: "driver-id", 
-        vehicleId: "vehicle-id", 
-        startLocation: "Test Start Location", 
+
+      const mockTrip = {
+        id: tripId,
+        driverId: "driver-id",
+        vehicleId: "vehicle-id",
+        startLocation: "Test Start Location",
         startTime: new Date(Date.now() - 3600000), // 1 hour ago
-        status: "IN_PROGRESS" 
+        status: "IN_PROGRESS"
       };
-      
-      const mockUpdatedTrip = { 
-        ...mockTrip, 
-        endLocation, 
-        endTime: expect.any(Date), 
-        status: "COMPLETED" 
+
+      const mockUpdatedTrip = {
+        ...mockTrip,
+        endLocation,
+        endTime: expect.any(Date),
+        status: "COMPLETED"
       };
 
       mockPrismaClient.trip.findUnique.mockResolvedValue(mockTrip);
@@ -147,6 +192,53 @@ describe("TripRepository", () => {
         where: { id: tripId },
         data: {
           endLocation,
+          endLatitude: undefined,
+          endLongitude: undefined,
+          endTime: expect.any(Date),
+          status: "COMPLETED",
+        },
+      });
+      expect(result).toEqual(mockUpdatedTrip);
+    });
+
+    it("should end a trip with coordinates", async () => {
+      // Arrange
+      const tripId = "trip-id";
+      const endLocation = "Test End Location";
+      const endLatitude = 40.7589;
+      const endLongitude = -73.9851;
+
+      const mockTrip = {
+        id: tripId,
+        driverId: "driver-id",
+        vehicleId: "vehicle-id",
+        startLocation: "Test Start Location",
+        startTime: new Date(Date.now() - 3600000), // 1 hour ago
+        status: "IN_PROGRESS"
+      };
+
+      const mockUpdatedTrip = {
+        ...mockTrip,
+        endLocation,
+        endLatitude,
+        endLongitude,
+        endTime: expect.any(Date),
+        status: "COMPLETED"
+      };
+
+      mockPrismaClient.trip.findUnique.mockResolvedValue(mockTrip);
+      mockPrismaClient.trip.update.mockResolvedValue(mockUpdatedTrip);
+
+      // Act
+      const result = await tripRepository.endTrip(tripId, endLocation, endLatitude, endLongitude);
+
+      // Assert
+      expect(mockPrismaClient.trip.update).toHaveBeenCalledWith({
+        where: { id: tripId },
+        data: {
+          endLocation,
+          endLatitude,
+          endLongitude,
           endTime: expect.any(Date),
           status: "COMPLETED",
         },
@@ -170,16 +262,16 @@ describe("TripRepository", () => {
       // Arrange
       const tripId = "trip-id";
       const endLocation = "Test End Location";
-      
-      const mockTrip = { 
-        id: tripId, 
-        driverId: "driver-id", 
-        vehicleId: "vehicle-id", 
-        startLocation: "Test Start Location", 
+
+      const mockTrip = {
+        id: tripId,
+        driverId: "driver-id",
+        vehicleId: "vehicle-id",
+        startLocation: "Test Start Location",
         startTime: new Date(Date.now() - 3600000), // 1 hour ago
         endLocation: "Already Ended",
         endTime: new Date(),
-        status: "COMPLETED" 
+        status: "COMPLETED"
       };
 
       mockPrismaClient.trip.findUnique.mockResolvedValue(mockTrip);

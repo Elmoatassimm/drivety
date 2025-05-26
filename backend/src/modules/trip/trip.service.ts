@@ -18,8 +18,8 @@ export class TripService extends BaseService<ITrip> implements ITripService {
     super(repository);
   }
 
-  async startTrip(driverId: string, vehicleId: string, startLocation: string): Promise<ITrip> {
-    console.log(`[TRIP SERVICE] Starting trip for driver: ${driverId}, vehicle: ${vehicleId}`);
+  async startTrip(driverId: string, vehicleId: string, startLocation?: string, startLatitude?: number, startLongitude?: number): Promise<ITrip> {
+    console.log(`[TRIP SERVICE] Starting trip for driver: ${driverId}, vehicle: ${vehicleId}, coordinates: ${startLatitude}, ${startLongitude}`);
 
     if (!driverId) {
       throw new BadRequestError("Driver ID is required");
@@ -29,31 +29,27 @@ export class TripService extends BaseService<ITrip> implements ITripService {
       throw new BadRequestError("Vehicle ID is required");
     }
 
-    if (!startLocation) {
-      throw new BadRequestError("Start location is required");
-    }
+
 
     try {
-      return await this.tripRepository.startTrip(driverId, vehicleId, startLocation);
+      return await this.tripRepository.startTrip(driverId, vehicleId, startLocation, startLatitude, startLongitude);
     } catch (error) {
       console.error(`[TRIP SERVICE] Error starting trip:`, error);
       throw error;
     }
   }
 
-  async endTrip(tripId: string, endLocation: string): Promise<ITrip> {
-    console.log(`[TRIP SERVICE] Ending trip with ID: ${tripId}`);
+  async endTrip(tripId: string, endLocation?: string, endLatitude?: number, endLongitude?: number, distance?: number, fuelConsumed?: number): Promise<ITrip> {
+    console.log(`[TRIP SERVICE] Ending trip with ID: ${tripId}, coordinates: ${endLatitude}, ${endLongitude}, distance: ${distance}, fuelConsumed: ${fuelConsumed}`);
 
     if (!tripId) {
       throw new BadRequestError("Trip ID is required");
     }
 
-    if (!endLocation) {
-      throw new BadRequestError("End location is required");
-    }
+
 
     try {
-      return await this.tripRepository.endTrip(tripId, endLocation);
+      return await this.tripRepository.endTrip(tripId, endLocation, endLatitude, endLongitude, distance, fuelConsumed);
     } catch (error) {
       console.error(`[TRIP SERVICE] Error ending trip:`, error);
       throw error;

@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from "express";
 import { container } from "../../config/container";
-import ResponseUtils from "../utils/response.utils";
 import JwtUtils from "../utils/jwt.utils";
 import { RequestWithUser } from "../../types/types";
 import { UnauthorizedError } from "../errors/AppError";
+import { UserRole } from "../../types/user.types";
 
 export default async function authMiddleware(
   req: RequestWithUser,
@@ -24,7 +24,8 @@ export default async function authMiddleware(
     req.user = {
       id: decoded.userId,
       email: decoded.email,
-      username: decoded.username
+      username: decoded.username,
+      role: decoded.role as UserRole
     };
     next();
   } catch (error) {
