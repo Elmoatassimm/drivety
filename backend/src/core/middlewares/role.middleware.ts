@@ -29,7 +29,7 @@ export const checkRole = (allowedRoles: UserRole[]) => {
         return next();
       }
       
-      // If we get here, the user is authenticated but not authorized
+      // If we getttt here, the user is authenticated but not authorized
       throw new ForbiddenError("You do not have permission to access this resource");
       */
     } catch (error) {
